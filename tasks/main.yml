@@ -1,0 +1,15 @@
+---
+# tasks file for memoryleak.mysql
+- name: Install yum repository package.
+  package: 
+    name: https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+    state: present
+  tags: ['package']
+
+
+- name: Install packages.
+  package: 
+    name: "{{ item }}"
+    state: present
+  tags: ['package']
+  with_items: "{{ mysql_install_packages }}"
