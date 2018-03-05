@@ -1,2 +1,15 @@
 ---
 # handlers file for memoryleak.mysql
+- name: mysqld-restarted-handler
+  service: 
+    enabled: yes
+    name: mysqld
+    state: restarted
+  tags: ['service']
+
+- name: mysqld-started-handler
+  service: 
+    enabled: yes
+    name: mysqld
+    state: started
+  tags: ['service']

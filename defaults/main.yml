@@ -1,2 +1,7 @@
 ---
 # defaults file for memoryleak.mysql
+mysql_server_packages:
+  - mysql-community-server
+
+mysql_client_packages:
+  - mysql-community-client
