@@ -1,13 +1,13 @@
 ---
 # tasks file for memoryleak.mysql
 - name: Install yum repository package.
-  package: 
+  package:
     name: https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
     state: present
   tags: ['package']
 
 - name: Install server packages.
-  package: 
+  package:
     name: "{{ item }}"
     state: present
   tags: ['package']
@@ -15,14 +15,14 @@
   notify: mysqld-started-handler
 
 - name: Install client packages.
-  package: 
+  package:
     name: "{{ item }}"
     state: present
   tags: ['package']
   with_items: "{{ mysql_client_packages }}"
 
 - name: Check if .my.cnf exists.
-  stat: 
+  stat:
     path: "{{ansible_env.HOME}}/.my.cnf"
   register: register_my_cnf
   tags: ['stat']
@@ -38,13 +38,13 @@
   when: register_my_cnf.stat.exists == false
 
 - name: Parse MySQL random password.
-  set_fact: 
+  set_fact:
     mysql_temporary_password: "{{ register_mysql_password.stdout | regex_search(': (.*)', '\\1')}}"
   tags: ['set_fact']
   when: register_my_cnf.stat.exists == false
 
 - name: Create .my.cnf file with random generated password.
-  template: 
+  template:
     dest: "{{ansible_env.HOME}}/.my.cnf"
     mode: 0644
     src: my.cnf.j2
