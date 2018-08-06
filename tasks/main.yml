@@ -4,13 +4,13 @@
   package:
     name: https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
     state: present
-  tags: ['package']
+  tags: ['package', 'mysql']
 
 - name: Install server packages.
   package:
     name: "{{ item }}"
     state: present
-  tags: ['package']
+  tags: ['package', 'mysql']
   with_items: "{{ mysql_server_packages }}"
   notify: mysqld-started-handler
 
@@ -18,35 +18,35 @@
   package:
     name: "{{ item }}"
     state: present
-  tags: ['package']
+  tags: ['package', 'mysql']
   with_items: "{{ mysql_client_packages }}"
 
 - name: Check if .my.cnf exists.
   stat:
     path: "{{ansible_env.HOME}}/.my.cnf"
   register: register_my_cnf
-  tags: ['stat']
+  tags: ['stat', 'mysql']
 
 - name: Start MySQL.
   meta: flush_handlers
-  tags: ['meta']
+  tags: ['meta', 'mysql']
 
 - name: Grep MySQL random password.
   command: "grep 'temporary password' /var/log/mysqld.log"
   register: register_mysql_password
-  tags: ['command']
+  tags: ['command', 'mysql']
   when: register_my_cnf.stat.exists == false
 
 - name: Parse MySQL random password.
   set_fact:
     mysql_temporary_password: "{{ register_mysql_password.stdout | regex_search(': (.*)', '\\1')}}"
-  tags: ['set_fact']
-  when: register_my_cnf.stat.exists == false
+  tags: ['set_fact', 'mysql']
+  when: register_my_cnf.stat.exists == false && mysql_create_cnf == true
 
 - name: Create .my.cnf file with random generated password.
   template:
     dest: "{{ansible_env.HOME}}/.my.cnf"
     mode: 0644
     src: my.cnf.j2
-  tags: ['template']
-  when: register_my_cnf.stat.exists == false
+  tags: ['template', 'mysql']
+  when: register_my_cnf.stat.exists == false && mysql_create_cnf == true
