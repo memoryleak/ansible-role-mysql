@@ -13,6 +13,7 @@
   tags: ['package', 'mysql']
   with_items: "{{ mysql_server_packages }}"
   notify: mysqld-started-handler
+  when: mysql_install_server
 
 - name: Install client packages.
   package:
@@ -30,18 +31,23 @@
 - name: Start MySQL.
   meta: flush_handlers
   tags: ['meta', 'mysql']
+  when: mysql_install_server
 
 - name: Grep MySQL random password.
   command: "grep 'temporary password' /var/log/mysqld.log"
   register: register_mysql_password
   tags: ['command', 'mysql']
-  when: register_my_cnf.stat.exists == false
+  when: 
+    - mysql_install_server 
+    - register_my_cnf.stat.exists == false
 
 - name: Parse MySQL random password.
   set_fact:
     mysql_temporary_password: "{{ register_mysql_password.stdout | regex_search(': (.*)', '\\1')}}"
   tags: ['set_fact', 'mysql']
-  when: register_my_cnf.stat.exists == false && mysql_create_cnf == true
+  when: 
+    - mysql_install_server 
+    - register_my_cnf.stat.exists == false
 
 - name: Create .my.cnf file with random generated password.
   template:
@@ -49,4 +55,6 @@
     mode: 0644
     src: my.cnf.j2
   tags: ['template', 'mysql']
-  when: register_my_cnf.stat.exists == false && mysql_create_cnf == true
+  when: 
+    - mysql_install_server 
+    - register_my_cnf.stat.exists == false

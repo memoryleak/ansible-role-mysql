@@ -6,4 +6,4 @@ mysql_server_packages:
 mysql_client_packages:
   - mysql-community-client
 
-mysql_create_cnf: false
+mysql_install_server: false
