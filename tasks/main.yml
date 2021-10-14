@@ -2,7 +2,7 @@
 # tasks file for memoryleak.mysql
 - name: Install yum repository package.
   package:
-    name: https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+    name: {{ mysql_package_url }}
     state: present
   tags: ['package', 'mysql']
 
@@ -37,16 +37,16 @@
   command: "grep 'temporary password' /var/log/mysqld.log"
   register: register_mysql_password
   tags: ['command', 'mysql']
-  when: 
-    - mysql_install_server 
+  when:
+    - mysql_install_server
     - register_my_cnf.stat.exists == false
 
 - name: Parse MySQL random password.
   set_fact:
     mysql_temporary_password: "{{ register_mysql_password.stdout | regex_search(': (.*)', '\\1')}}"
   tags: ['set_fact', 'mysql']
-  when: 
-    - mysql_install_server 
+  when:
+    - mysql_install_server
     - register_my_cnf.stat.exists == false
 
 - name: Create .my.cnf file with random generated password.
@@ -55,6 +55,6 @@
     mode: 0644
     src: my.cnf.j2
   tags: ['template', 'mysql']
-  when: 
-    - mysql_install_server 
+  when:
+    - mysql_install_server
     - register_my_cnf.stat.exists == false
