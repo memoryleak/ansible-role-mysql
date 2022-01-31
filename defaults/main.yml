@@ -7,3 +7,5 @@ mysql_client_packages:
   - mysql-community-client
 
 mysql_install_server: false
+
+mysql_package_url: "https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm"
